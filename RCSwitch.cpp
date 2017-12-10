@@ -1,4 +1,10 @@
 /*
+ * RCSwitch library for Raspberry Pi, Arduino amd ESP8266
+ * Cloned from https://github.com/sui77/rc-switch/
+ * 
+ * Update by David Randler
+ *   - Support for [Matrix Creator](https://creator.matrix.one) gpios
+ *
   RCSwitch - Arduino libary for remote control outlet switches
   Copyright (c) 2011 Suat Özgür.  All right reserved.
   
@@ -38,6 +44,12 @@
     // so we must normalize these for the ARM processor:
     #define PROGMEM
     #define memcpy_P(dest, src, num) memcpy((dest), (src), (num))
+    #ifdef MatrixCreator
+        #define INPUT 0
+        #define OUTPUT 1
+        #define pinMode(pin, mode) gpio.SetMode((pin), (mode))
+        #define digitalWrite(pin, value) gpio.SetGPIOValue((pin), (value))    
+#endif
 #endif
 
 #if defined(ESP8266) || defined(ESP32)
@@ -99,10 +111,19 @@ const unsigned int RCSwitch::nSeparationLimit = 4300;
 unsigned int RCSwitch::timings[RCSWITCH_MAX_CHANGES];
 #endif
 
+#ifdef MatrixCreator
+matrix_hal::WishboneBus bus;
+matrix_hal::GPIOControl gpio;
+#endif
+
 RCSwitch::RCSwitch() {
   this->nTransmitterPin = -1;
   this->setRepeatTransmit(10);
   this->setProtocol(1);
+  #ifdef MatrixCreator
+  bus.SpiInit();
+  gpio.Setup(&bus);
+  #endif
   #if not defined( RCSwitchDisableReceiving )
   this->nReceiverInterrupt = -1;
   this->setReceiveTolerance(60);

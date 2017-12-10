@@ -1,4 +1,10 @@
 /*
+ * RCSwitch library for Raspberry Pi, Arduino amd ESP8266
+ * Cloned from https://github.com/sui77/rc-switch/
+ * 
+ * Update by David Randler
+ *   - Support for [Matrix Creator](https://creator.matrix.one) gpios
+ *
   RCSwitch - Arduino libary for remote control outlet switches
   Copyright (c) 2011 Suat Özgür.  All right reserved.
 
@@ -41,6 +47,12 @@
     #include <string.h> /* memcpy */
     #include <stdlib.h> /* abs */
     #include <wiringPi.h>
+    #ifdef (MatrixCreator)
+        #include <unistd.h>
+        #include <iostream>
+        #include <matrix_hal/gpio_control.h>
+        #include <matrix_hal/wishbone_bus.h>
+    #endif
 #elif defined(SPARK)
     #include "application.h"
 #else
@@ -52,7 +64,8 @@
 
 // At least for the ATTiny X4/X5, receiving has to be disabled due to
 // missing libm depencies (udivmodhi4)
-#if defined( __AVR_ATtinyX5__ ) or defined ( __AVR_ATtinyX4__ )
+// Matrix Creator is currently missing an interrupt interface
+#if defined( __AVR_ATtinyX5__ ) or defined ( __AVR_ATtinyX4__ ) or defined(MatrixCreator)
 #define RCSwitchDisableReceiving
 #endif
 
