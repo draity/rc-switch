@@ -47,7 +47,7 @@
     #include <string.h> /* memcpy */
     #include <stdlib.h> /* abs */
     #include <wiringPi.h>
-    #ifdef (MatrixCreator)
+    #ifdef MatrixCreator
         #include <unistd.h>
         #include <iostream>
         #include <matrix_hal/gpio_control.h>
